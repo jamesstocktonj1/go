@@ -6,5 +6,9 @@ import (
 )
 
 func ResourceMetrics(data *metricdata.ResourceMetrics) (*types.ResourceMetrics, error) {
-	return nil, nil
+	return &types.ResourceMetrics{
+		Resource:     Resource(data.Resource),
+		ScopeMetrics: ScopeMetrics(data.ScopeMetrics),
+		SchemaUrl:    data.Resource.SchemaURL(),
+	}, nil
 }

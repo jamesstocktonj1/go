@@ -2,13 +2,17 @@ package wasitelmetric
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"sync"
 
 	metric "go.opentelemetry.io/otel/sdk/metric"
 	"go.opentelemetry.io/otel/sdk/metric/metricdata"
+	"go.wasmcloud.dev/component/log/wasilog"
 	"go.wasmcloud.dev/x/wasitel/wasitelmetric/internal/convert"
 )
+
+var logger = wasilog.ContextLogger("wasitelmetric")
 
 func New(opts ...Option) (*Exporter, error) {
 	client := newClient(opts...)
@@ -57,6 +61,12 @@ func (e *Exporter) Export(ctx context.Context, data *metricdata.ResourceMetrics)
 	if err != nil {
 		return err
 	}
+
+	dataString, err := json.Marshal(metrics)
+	if err != nil {
+		return err
+	}
+	logger.Info(string(dataString))
 
 	err = e.client.UploadMetrics(ctx, metrics)
 	if err != nil {
